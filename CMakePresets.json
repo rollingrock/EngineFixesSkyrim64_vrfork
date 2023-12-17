@@ -14,7 +14,7 @@
           "type": "BOOL",
           "value": "OFF"
         },
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /wd4996 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /wd4996 /wd5082 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
       "errors": {
         "deprecated": true

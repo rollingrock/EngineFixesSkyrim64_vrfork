@@ -45,13 +45,22 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 
 bool CheckVersion(const REL::Version& a_version)
 {
-    const auto success = a_version >= SKSE::RUNTIME_1_6_629;
-    if (!success)
-        logger::critical("Unsupported runtime version {}"sv, a_version.string());
+    if (a_version
+#ifndef SKYRIMVR
+        < SKSE::RUNTIME_1_5_39
+#else
+        > SKSE::RUNTIME_VR_1_4_15_1
+#endif
+    )
+    {
+        logger::critical(FMT_STRING("Unsupported runtime version {}"), a_version.string());
+        return false;
+    }
 
-    return success;
+    return true;
 }
 
+#ifdef SKYRIM_AE
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
     SKSE::PluginVersionData v{};
     v.pluginVersion = Version::MAJOR;
@@ -62,6 +71,35 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
     v.UsesStructsPost629(true);
     return v;
 }();
+#else
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+{
+    a_info->infoVersion = SKSE::PluginInfo::kVersion;
+    a_info->name = "DualCastingFix";
+    a_info->version = Version::MAJOR;
+
+    if (a_skse->IsEditor())
+    {
+        logger::critical("Loaded in editor, marking as incompatible"sv);
+        return false;
+    }
+
+    const auto ver = a_skse->RuntimeVersion();
+    if (ver
+#ifndef SKYRIMVR
+        < SKSE::RUNTIME_1_5_39
+#else
+        > SKSE::RUNTIME_VR_1_4_15_1
+#endif
+    )
+    {
+        logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
+        return false;
+    }
+
+    return true;
+}
+#endif
 
 extern "C" void DLLEXPORT APIENTRY Initialize()
 {
