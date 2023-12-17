@@ -1,7 +1,6 @@
 {
   "configurePresets": [
     {
-      "binaryDir": "build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
@@ -14,7 +13,8 @@
         "CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG": {
           "type": "BOOL",
           "value": "OFF"
-        }
+        },
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /wd4996 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
       "errors": {
         "deprecated": true
