@@ -36,7 +36,11 @@ namespace patches
                 {
                     // Find first valid tree object by ESP/ESM load order
                     auto dataHandler = RE::TESDataHandler::GetSingleton();
+#ifdef SKYRIMVR
+                    for (std::uint32_t i = 0; i < dataHandler->loadedModCount; i++)
+#else
                     for (std::uint32_t i = 0; i < dataHandler->compiledFileCollection.files.size(); i++)
+#endif
                     {
                         RE::TESForm* form = LookupFormByID((i << 24) | maskedFormId);
                         if (form)
