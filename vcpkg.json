@@ -7,7 +7,8 @@
     "boost-stl-interfaces",
     "spdlog",
     "tbb",
-    "xbyak"
+    "xbyak",
+    "rsm-binary-io"
   ],
   "builtin-baseline": "57d3194e702a2959e86a6748999ad71fc24f7922",
   "overrides": [

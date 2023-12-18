@@ -45,11 +45,19 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 
 bool CheckVersion(const REL::Version& a_version)
 {
-    const auto success = a_version >= SKSE::RUNTIME_1_5_39;
-    if (!success)
-        logger::critical("Unsupported runtime version {}"sv, a_version.string());
+    if (a_version
+#ifndef SKYRIMVR
+        < SKSE::RUNTIME_1_5_39
+#else
+        > SKSE::RUNTIME_VR_1_4_15_1
+#endif
+    )
+    {
+        logger::critical(FMT_STRING("Unsupported runtime version {}"), a_version.string());
+        return false;
+    }
 
-    return success;
+    return true;
 }
 
 extern "C" void DLLEXPORT APIENTRY Initialize()

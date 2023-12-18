@@ -1,7 +1,6 @@
 {
   "configurePresets": [
     {
-      "binaryDir": "build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
@@ -14,7 +13,8 @@
         "CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG": {
           "type": "BOOL",
           "value": "OFF"
-        }
+        },
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /wd4996 /wd5082 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
       "errors": {
         "deprecated": true
@@ -26,21 +26,35 @@
         "dev": true
       }
     },
-    {
-      "environment": {
-        "CXXFLAGS": "/MP /W4 /WX /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
-      },
-      "generator": "Visual Studio 16 2019",
-      "hidden": true,
-      "name": "vs2019"
-    },
 	{
       "environment": {
         "CXXFLAGS": "/MP /W4 /WX /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
       "generator": "Visual Studio 17 2022",
       "hidden": true,
+      "toolset": "v143",
       "name": "vs2022"
+    },
+    {
+      "name": "se",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "ae",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/buildae",
+      "cacheVariables": {
+        "BUILD_SKYRIMAE": true
+      }
+    },
+    {
+      "name": "vr",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/buildvr",
+      "cacheVariables": {
+        "BUILD_SKYRIMVR": true
+      }
     },
     {
       "cacheVariables": {
@@ -82,25 +96,36 @@
       "hidden": true,
       "name": "windows"
     },
-    {
-      "description": "VS2019/Windows/VCPkg",
-      "inherits": [
-        "cmake-dev",
-        "vcpkg",
-        "vs2019",
-        "windows"
-      ],
-      "name": "vs2019-windows-vcpkg"
-    },
 	{
       "description": "VS2022/Windows/VCPkg",
       "inherits": [
         "cmake-dev",
         "vcpkg",
         "vs2022",
+        "se",
         "windows"
       ],
       "name": "vs2022-windows-vcpkg"
+    },
+    {
+      "name": "vs2022-windows-vcpkg-ae",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "ae"
+      ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "vr"
+      ]
     }
   ],
   "version": 2

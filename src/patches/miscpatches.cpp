@@ -258,7 +258,11 @@ namespace patches
             loadSet = true;
             logger::info("load order finished"sv);
             auto dhnl = RE::TESDataHandler::GetSingleton();
+#ifdef SKYRIMVR
+            for (auto& mod : dhnl->loadedMods)
+#else
             for (auto& mod : dhnl->compiledFileCollection.files)
+#endif
             {
                 mod->recordFlags |= RE::TESFile::RecordFlag::kMaster;
             }

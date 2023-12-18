@@ -1611,13 +1611,21 @@ namespace fixes
         static void LoadGame(RE::Sky* a_this, RE::BGSLoadGameBuffer* a_loadGameBuffer)
         {
             _LoadGame(a_this, a_loadGameBuffer);
-            a_this->flags |= 0x7E00; 
+#ifdef SKYRIMVR
+            a_this->flags.set(RE::Sky::Flags::kUpdateSunriseBegin, RE::Sky::Flags::kUpdateSunriseEnd, RE::Sky::Flags::kUpdateSunsetBegin, RE::Sky::Flags::kUpdateSunsetEnd, RE::Sky::Flags::kUpdateColorsSunriseBegin, RE::Sky::Flags::kUpdateColorsSunsetEnd);
+#else
+            a_this->flags |= 0x7E00;
+#endif
         }
 
         static void SetClimate(RE::Sky* a_this, RE::TESClimate* a_climate, bool a_force)
         {
             _SetClimate(a_this, a_climate, a_force);
+#ifdef SKYRIMVR
+            a_this->flags.set(RE::Sky::Flags::kUpdateSunriseBegin, RE::Sky::Flags::kUpdateSunriseEnd, RE::Sky::Flags::kUpdateSunsetBegin, RE::Sky::Flags::kUpdateSunsetEnd, RE::Sky::Flags::kUpdateColorsSunriseBegin, RE::Sky::Flags::kUpdateColorsSunsetEnd);
+#else
             a_this->flags |= 0x7E00;
+#endif
         }
 
         static inline REL::Relocation<decltype(LoadGame)> _LoadGame;
