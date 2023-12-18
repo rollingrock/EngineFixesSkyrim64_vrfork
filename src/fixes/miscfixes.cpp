@@ -717,7 +717,7 @@ namespace fixes
             patch.ready();
 
             REL::Relocation<std::uintptr_t> target{ REL::ID(101499) };
-            REL::safe_write(target.address() + 0x1AFD, stl::span{ patch.getCode(), patch.getSize() });
+            REL::safe_write(target.address() + 0x1AFD, stl::span{ patch.getCode(), patch.getSize() });  // VR 1c6d
         }
 
         // BGSShaderParticleGeometryData::Load
@@ -1039,7 +1039,7 @@ namespace fixes
                 }
             };
 
-            REL::Relocation<std::uintptr_t> target{ REL::ID(100771), 0x37 };
+            REL::Relocation<std::uintptr_t> target{ REL::ID(100771), 0x37 };  // VR same
             Patch patch(target.address());
             patch.ready();
 
@@ -1330,7 +1330,7 @@ namespace fixes
         const uint64_t faddr = fid.address();
         logger::trace(FMT_STRING("- workaround for crash in ShadowSceneNode::unk_{:X} -"), fid.offset());
 
-        const uint8_t *crashaddr = (uint8_t*)(uintptr_t)(faddr + 22);
+        const uint8_t* crashaddr = (uint8_t*)(uintptr_t)(faddr + 22);
         /*
                         mov     rax,qword ptr [rdx]
         ... some movs ...
@@ -1340,15 +1340,15 @@ namespace fixes
         */
 
         static const uint8_t expected[] = { 0xFF, 0x50, 0x18, 0x84, 0xC0, 0x74 };
-        if(std::memcmp((const void*)crashaddr, expected, sizeof(expected)))
+        if (std::memcmp((const void*)crashaddr, expected, sizeof(expected)))
         {
             logger::trace("Code is not as expected, skipping patch"sv);
             return false;
         }
 
-        const int8_t disp8 = crashaddr[sizeof(expected)]; // jz short displacement (should be 0x16)
-        const uint8_t *jmpdstZero    = crashaddr + sizeof(expected) + disp8 + 1;
-        const uint8_t *jmpdstNonZero = crashaddr + sizeof(expected) + 1;
+        const int8_t disp8 = crashaddr[sizeof(expected)];  // jz short displacement (should be 0x16)
+        const uint8_t* jmpdstZero = crashaddr + sizeof(expected) + disp8 + 1;
+        const uint8_t* jmpdstNonZero = crashaddr + sizeof(expected) + 1;
 
         struct Code : Xbyak::CodeGenerator
         {
@@ -1420,51 +1420,51 @@ namespace fixes
         const uint64_t faddr = REL::ID(26343).address();
 
         // check that test rdx,rdx and jz short are there
-        uint8_t *testrdx = (uint8_t*)(uintptr_t)(faddr + 0x30);
+        uint8_t* testrdx = (uint8_t*)(uintptr_t)(faddr + 0x30);
         static const uint8_t expectedTestRdxJz[] = { 0x48, 0x85, 0xD2, 0x74 };
-        if(std::memcmp(testrdx, expectedTestRdxJz, sizeof(expectedTestRdxJz)))
+        if (std::memcmp(testrdx, expectedTestRdxJz, sizeof(expectedTestRdxJz)))
             return false;
 
         // Where does the jz short go?
-        const int8_t disp8 = testrdx[sizeof(expectedTestRdxJz)]; // jz short displacement (should be 0x14)
-              uint8_t *jmpdstZero = testrdx + sizeof(expectedTestRdxJz) + disp8 + 1;
+        const int8_t disp8 = testrdx[sizeof(expectedTestRdxJz)];  // jz short displacement (should be 0x14)
+        uint8_t* jmpdstZero = testrdx + sizeof(expectedTestRdxJz) + disp8 + 1;
         // const uint8_t *jmpdstNonZero = testrdx + sizeof(expectedTestRdxJz) + 1; // success case
 
         // Is the zero case jump target 'mov rbx, r15'? (This is patched later)
         static const uint8_t expectedMovRbx[] = { 0x49, 0x8B, 0xDF };
-        if(std::memcmp(jmpdstZero, expectedMovRbx, sizeof(expectedMovRbx)))
+        if (std::memcmp(jmpdstZero, expectedMovRbx, sizeof(expectedMovRbx)))
             return false;
 
         // Find the where to insert the trampoline jump and where the jump to the exit is
-        uint8_t *pUnsafeMov = jmpdstZero + sizeof(expectedMovRbx); // this is the mov that potentially causes a crash
-        if(pUnsafeMov[0] != 0x8B)
+        uint8_t* pUnsafeMov = jmpdstZero + sizeof(expectedMovRbx);  // this is the mov that potentially causes a crash
+        if (pUnsafeMov[0] != 0x8B)
             return false;
 
-        static const uint8_t copysize = 3; // mov -- can't just copy the comiss because it uses a relative address :<
-        const uint8_t *jbExit = pUnsafeMov + copysize + 7; // + comiss
+        static const uint8_t copysize = 3;                  // mov -- can't just copy the comiss because it uses a relative address :<
+        const uint8_t* jbExit = pUnsafeMov + copysize + 7;  // + comiss
 
         // Make sure jb => exit is there as expected
         static const uint8_t expectedJB[] = { 0x0f, 0x82 };
-        if(std::memcmp(jbExit, expectedJB, sizeof(expectedJB)))
+        if (std::memcmp(jbExit, expectedJB, sizeof(expectedJB)))
             return false;
 
         // Get the jump offset
         int32_t jbOffs = *(int32_t*)(jbExit + sizeof(expectedJB));
 
         // Figure out where the function exit location is
-        const uint8_t *nextInst = jbExit + 2 + sizeof(int32_t);
-        const uint8_t *exitLoc = nextInst + jbOffs;
+        const uint8_t* nextInst = jbExit + 2 + sizeof(int32_t);
+        const uint8_t* exitLoc = nextInst + jbOffs;
 
         struct Code : Xbyak::CodeGenerator
         {
-            Code(const uint8_t *originalcode, std::uintptr_t pContLoc, std::uintptr_t pExitLoc) : Xbyak::CodeGenerator()
+            Code(const uint8_t* originalcode, std::uintptr_t pContLoc, std::uintptr_t pExitLoc) : Xbyak::CodeGenerator()
             {
                 Xbyak::Label zeroLbl, fltConstL;
 
                 test(rbx, rbx);
                 jz(zeroLbl);
 
-                db(originalcode, copysize); // the unsafe mov
+                db(originalcode, copysize);  // the unsafe mov
                 comiss(xmm6, ptr[rip + fltConstL]);
 
                 jmp(ptr[rip]);
@@ -1475,7 +1475,7 @@ namespace fixes
                 dq(pExitLoc);
 
                 L(fltConstL);
-                dd(0x0BF800000); // -1.0f
+                dd(0x0BF800000);  // -1.0f
             }
         };
 
@@ -1496,8 +1496,8 @@ namespace fixes
         {
             Patch()
             {
-                xor_(ebx, ebx); // 2 bytes
-                nop();          // 1 byte
+                xor_(ebx, ebx);  // 2 bytes
+                nop();           // 1 byte
             }
         };
         Patch patch;
@@ -1537,13 +1537,13 @@ namespace fixes
         logger::trace("- fix for crash in HitData::InitializeHitData -"sv);
 
         const uint64_t faddr = REL::ID(42832).address();
-        const uint8_t *locMovR15 = unrestricted_cast<const uint8_t*>(faddr + 14);
+        const uint8_t* locMovR15 = unrestricted_cast<const uint8_t*>(faddr + 14);
         //                        mov r15,r9          mov rbp,r8 (replicated in the trampoline code below)
-        const uint8_t expected[] = { 0x4D, 0x8B, 0xF9,   0x49, 0x8B, 0xE8 };
-        if(std::memcmp(locMovR15, expected, sizeof(expected)))
+        const uint8_t expected[] = { 0x4D, 0x8B, 0xF9, 0x49, 0x8B, 0xE8 };
+        if (std::memcmp(locMovR15, expected, sizeof(expected)))
             return false;
 
-        const uint8_t *locNext = locMovR15 + sizeof(expected);
+        const uint8_t* locNext = locMovR15 + sizeof(expected);
 
         struct Patch : Xbyak::CodeGenerator
         {
@@ -1556,11 +1556,11 @@ namespace fixes
                 xor_(r15, r15);
                 test(r9, r9);
                 jz(out);
-                mov(rbx, qword[r9]); // rbx is free to clobber at this point since there was a 'push rbx' before
+                mov(rbx, qword[r9]);  // rbx is free to clobber at this point since there was a 'push rbx' before
                 test(rbx, rbx);
-                cmovnz(r15, r9); // keep weapon only if weapon->object != NULL
+                cmovnz(r15, r9);  // keep weapon only if weapon->object != NULL
                 L(out);
-                mov(rbp, r8); // Restore this from where the trampoline jump was placed
+                mov(rbp, r8);  // Restore this from where the trampoline jump was placed
                 jmp(ptr[rip]);
                 dq(continueAt);
             }

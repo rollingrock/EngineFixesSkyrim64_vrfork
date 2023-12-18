@@ -12,7 +12,7 @@ namespace fixes
 
     REL::Relocation<std::uintptr_t> BGSSaveLoadManager_ProcessEvents_RequestScreenshot{ BGSSaveLoadManager_ProcessEvents_RequestScreenshot_hook_offset, 0x163 };
     REL::Relocation<std::uintptr_t> MenuSave_RequestScreenshot{ MenuSave_RequestScreenshot_hook_offset, 0x56A };
-    REL::Relocation<std::uintptr_t> ScreenshotJnz{ Screenshot_Jnz_hook_offset, 0x23A };
+    REL::Relocation<std::uintptr_t> ScreenshotJnz{ Screenshot_Jnz_hook_offset, 0x23A };  // VR 25e
     REL::Relocation<std::uintptr_t> RenderTargetHook_1{ Render_Target_Hook_1_offset, 0x365 };
     REL::Relocation<std::uintptr_t> RenderTargetHook_2{ Render_Target_Hook_2_offset, 0x3EA };
     REL::Relocation<std::uintptr_t> SaveScreenshotRequestedDword{ g_RequestSaveScreenshot_offset };
