@@ -11,7 +11,7 @@ namespace patches
     // 5th function in??_7BSWaterShader@@6B@ vtbl
     // F3 0F 10 0D ? ? ? ? F3 0F 11 4C 82 ?
     // loads TIMER_DEFAULT which is a timer representing the GameHour in seconds
-    REL::Relocation<std::uintptr_t> WaterShader_ReadTimer_Hook{ WaterShader_ReadTimer_Hook_offset, 0x4A9 };
+    REL::Relocation<std::uintptr_t> WaterShader_ReadTimer_Hook{ WaterShader_ReadTimer_Hook_offset, 0x4A9 };  // VR 4bb
 
     float timer = 8 * 3600;  // Game timer inits to 8 AM
 
@@ -155,10 +155,11 @@ namespace patches
 
         const auto handle = GetModuleHandleW(L"API-MS-WIN-CRT-STDIO-L1-1-0.DLL");
         const auto proc = handle ?
-            reinterpret_cast<decltype(&_setmaxstdio)>(GetProcAddress(handle, "_setmaxstdio")) :
-            nullptr;
+                              reinterpret_cast<decltype(&_setmaxstdio)>(GetProcAddress(handle, "_setmaxstdio")) :
+                              nullptr;
 
-        if (!proc) {
+        if (!proc)
+        {
             logger::trace("crt stdio module not found, failed"sv);
             return false;
         }
